@@ -6,8 +6,6 @@ conn = sql.sqlInit('recipeDatabase.db')
 uniqueIDTotal = np.linspace(1, sql.sqlCount(conn)[0], sql.sqlCount(conn)[0])
 colNameArray = sql.sqlGetColNames(conn)
 
-print(len(colNameArray))
-
 colEntriesArray = []
 for colName in colNameArray:
     colEntries = sql.sqlGetCol(conn, colName)
