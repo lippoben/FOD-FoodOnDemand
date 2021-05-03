@@ -63,7 +63,7 @@ def sqlPrintAll(databaseConn):
 def sqlCount(databaseConn):
     cursor = databaseConn.execute('SELECT COUNT(*) FROM RECIPES;')
     for row in cursor:
-        return row
+        return row[0]
 
 
 # Returns an array of all the column names
@@ -99,24 +99,3 @@ def sqlInsertRecords(databaseConn, PriID, URL, RECIPENAME, INGREDIENTS, CLEANING
                       VALUES ("+str(PriID)+",\'"+str(URL)+"\',\'"+str(RECIPENAME)+"\',\'"+str(INGREDIENTS)+"\', \'"+str(CLEANINGREDIENTS)+"\' , \'"+str(METHOD)+"\',\'"+str(INFOTAG)+"\')"
     databaseConn.execute(insertStatement)
     # print("Records created successfully")
-
-
-'''
-# this is an example of how to create and insert stuff
-# -----------------------------
-conn = sqlInit("recipeDatabase.db")
-# sqlCreateTable(conn)
-# sqlInsertRecords(conn, 3, "chicky nuggys", "chicken")
-# sqlAddColumn(conn, 'CLEANINGREDIENTS', 'TEXT')
-# sqlPrintAll(conn)
-# print(sqlGetSpecificID(conn, 'INGREDIENTS', 2806)
-
-infotagsArray = sqlGetCol(conn, 'INFOTAGS')
-for infotags in infotagsArray:
-    if infotags == 'Vegan':
-        print(infotags)
-#sqlDeleteEntry(conn, 5464)
-#sqlCommit(conn)
-
-sqlClose(conn)
-'''
