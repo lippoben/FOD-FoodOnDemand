@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-all_ingredients = pd.read_csv("normalised_ingredients.csv")
+all_ingredients = pd.read_csv("NormalisedIngredients.csv")
 
 random_ingredients_1 = all_ingredients["Ingredients"][0:50]
 random_ingredients_1 = random_ingredients_1.to_numpy()
@@ -23,4 +23,4 @@ random_ingredients = pd.concat([random_ingredients_1, random_ingredients_2])
 print(random_ingredients.shape)
 print(random_ingredients)
 
-random_ingredients.to_csv("random_ingredients.csv")
+random_ingredients.to_csv("RandomIngredients.csv")
