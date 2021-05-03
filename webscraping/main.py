@@ -165,12 +165,11 @@ while linksToExplore:
                     recipeName = scrapeRecipeName(soup.find_all('h1', class_='post-header__title post-header__title--masthead-layout heading-1'))
                     ingredientsArray = scrapeIngredients(soup.find_all('li', class_='pb-xxs pt-xxs list-item list-item--separator'))
                     cleanIngredientsArray = cleanIngredients(ingredientsArray)
-                    infoTagsArray = scrapeVeganTag(soup.find_all('div', class_='icon-with-text icon-with-text--aligned'))
+                    infoTagsArray = scrapeVeganTag(soup.find_all('span', class_='terms-icons-list__text'))
                     methodArray = scrapeMethod(soup.find('ul', class_='grouped-list__list list'))
                     linkString = str(link).replace('\'', '')
-
-                    # sql.sqlInsertRecords(connection, primaryKeyId, recipeName, ingredientsArray, infoTagsArray)
-                    sql.sqlInsertRecords(connection, primaryKeyId, linkString, recipeName, ingredientsArray, cleanIngredientsArray, methodArray, infoTagsArray)
+                    sql.sqlInsertRecords(connection, primaryKeyId, linkString, recipeName, ingredientsArray,
+                                         cleanIngredientsArray, methodArray, infoTagsArray)
                     sql.sqlCommit(connection)
                     primaryKeyId += 1
 
@@ -190,7 +189,7 @@ while linksToExplore:
                         else:
                             linksToExplore.append(href.get('href'))
 
-                if primaryKeyId % 101 == 0:
+                if len(linksToExplore) % 100 == 0:
                     print("Recipes Found: " + str(primaryKeyId - 1))
                     print("Links left to explore: " + str(len(linksToExplore)) + "\n")
 

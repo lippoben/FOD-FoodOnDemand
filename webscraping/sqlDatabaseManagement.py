@@ -1,4 +1,5 @@
 import sqlite3
+import numpy as np
 
 
 # creates a connection to a pre-existing database. If the database doesn't exist then create a new one.
@@ -108,10 +109,14 @@ conn = sqlInit("recipeDatabase.db")
 # sqlInsertRecords(conn, 3, "chicky nuggys", "chicken")
 # sqlAddColumn(conn, 'CLEANINGREDIENTS', 'TEXT')
 # sqlPrintAll(conn)
-print(sqlGetSpecificID(conn, 'INGREDIENTS', 2806))
-sqlDeleteEntry(conn, 2806)
-print(sqlGetSpecificID(conn, 'INGREDIENTS', 2806))
-sqlCommit(conn)
+# print(sqlGetSpecificID(conn, 'INGREDIENTS', 2806)
+
+infotagsArray = sqlGetCol(conn, 'INFOTAGS')
+for infotags in infotagsArray:
+    if infotags == 'Vegan':
+        print(infotags)
+#sqlDeleteEntry(conn, 5464)
+#sqlCommit(conn)
 
 sqlClose(conn)
 '''
