@@ -1,14 +1,17 @@
 import re
 import os
-import webscraping.sqlDatabaseManagement as sql
+
+import numpy as np
 from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 from gensim.test.utils import common_texts
 import gensim.models
-from glove import glove, Corpus
+from glove import Glove, Corpus
 
 
 def stemSentence(sentence):
+    wnl = WordNetLemmatizer()
     token_words = word_tokenize(sentence)
     stem_sentence_var = []
     for word in token_words:
@@ -28,11 +31,36 @@ def getUniqueWords(sentence):
     return sentence.split()
 
 
-wnl = WordNetLemmatizer()
-conn = sql.sqlInit('C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/webscraping/recipeDatabase.db')
-file = open('C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/GloVe/corpora/methodCorpus/methodSentence1.txt', 'r')
+def trainModel():
+    corpusTextFileNameArray = os.listdir('corpora/methodCorpus/')
+    corpusTextArray = []
+    for corpusTextFileName in corpusTextFileNameArray:
+        with open('corpora/methodCorpus/' + corpusTextFileName, 'r') as f:
+            corpusTextArray.append(f.read().split())
 
-print(file.read().split())
+    corpus = Corpus()
 
-model = gensim.models.Word2Vec(sentences=common_texts, window=5, min_count=1, workers=4)
-print(model)
+    corpus.fit(corpusTextArray, window=10)
+
+    glove = Glove(no_components=5, learning_rate=0.05)
+    glove.fit(corpus.matrix, epochs=30, no_threads=4, verbose=True)
+    glove.add_dictionary(corpus.dictionary)
+    glove.save('glove.txt')
+
+
+# trainModel()
+corpusTextFileNameArray = os.listdir('corpora/methodCorpus/')
+corpusTextArray = []
+for corpusTextFileName in corpusTextFileNameArray:
+    with open('corpora/methodCorpus/' + corpusTextFileName, 'r') as f:
+        text = f.read()
+        corpusTextArray.append(text.split())
+        textTokens = word_tokenize(text)
+        print(textTokens)
+        textWithoutStopWords = [word for word in textTokens if not word in stopwords.words()]
+        print(textWithoutStopWords)
+        print("\n")
+
+model = Glove.load('glove.txt')
+print(model.word_vectors[model.dictionary['potato']])
+
