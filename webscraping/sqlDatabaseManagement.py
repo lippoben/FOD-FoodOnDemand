@@ -99,3 +99,9 @@ def sqlInsertRecords(databaseConn, PriID, URL, RECIPENAME, INGREDIENTS, CLEANING
                       VALUES ("+str(PriID)+",\'"+str(URL)+"\',\'"+str(RECIPENAME)+"\',\'"+str(INGREDIENTS)+"\', \'"+str(CLEANINGREDIENTS)+"\' , \'"+str(METHOD)+"\',\'"+str(INFOTAG)+"\')"
     databaseConn.execute(insertStatement)
     # print("Records created successfully")
+
+
+# allows for a custom query to be made if a the functionality hasn't been added to this module yet
+def sqlCustomQuery(databaseConn, query):
+    cursor = databaseConn.execute(query)
+    return cursor
