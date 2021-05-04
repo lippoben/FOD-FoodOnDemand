@@ -4,6 +4,10 @@ import re
 import pandas as pd
 
 
+def removeDuplicates(myList):
+    return list(dict.fromkeys(myList))
+
+
 def stemSentence(sentence):
     # used when cleaning and normalising ingredients
     wnl = WordNetLemmatizer()
@@ -24,13 +28,12 @@ def normaliseIngredients(string):
 
 def cleanIngredients(dirtyIngredients):
     # pre load potential ingredients csv. used for cleaning and normalising ingredients
-    allIngredients = pd.read_csv("normalisedIngredients.csv")
-    splitIngredients = dirtyIngredients.split(",")
+    allIngredients = pd.read_csv("C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/NLP/normalisedIngredients.csv")
     cleanSplitIngredients = []
     normalisedIngredients = []
 
-    for i in range(0, len(splitIngredients)):
-        cleanSplitIngredients.append(normaliseIngredients(splitIngredients[i]))
+    for i in range(0, len(dirtyIngredients)):
+        cleanSplitIngredients.append(normaliseIngredients(dirtyIngredients[i]))
         words = cleanSplitIngredients[i].split(" ")[:-1]
         longestWord = ""
 
@@ -45,11 +48,4 @@ def cleanIngredients(dirtyIngredients):
         if longestWord != "":
             normalisedIngredients.append(longestWord)
 
-    normalisedIngredients = set(normalisedIngredients)
-    normalisedIngredients = list(normalisedIngredients)
-
-    normalisedIngredients = str(normalisedIngredients)
-    normalisedIngredients = normalisedIngredients.replace('[', '')
-    normalisedIngredients = normalisedIngredients.replace(']', '')
-    normalisedIngredients = normalisedIngredients.replace('\'', '')
-    return normalisedIngredients
+    return removeDuplicates(normalisedIngredients)

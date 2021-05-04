@@ -4,17 +4,19 @@ from pprint import pprint
 from webscraping import sqlDatabaseManagement as sql
 # from Veganiser import veganiser
 from NLP.checkIngredients import checkIngredients
-from NLP.ingredientNormliser import normaliseIngredients
+from NLP.ingredientNormliser import cleanIngredients
 
 # establish connection to database
 recipeConn = sql.sqlInit('recipeDatabase.db')
 
 # this will be what the user has in stock
-userInput = np.array(['egg', 'potato', 'olive oil'])
-# userInput = normaliseIngredients(userInput)
+userInput = np.array(['eggs', 'potatoes', 'olives oil'])
+
+# normalise and clean users input
+normalisedUserInput = cleanIngredients(userInput)
 
 # Green light recipes here
-greenLitRecipesArray = checkIngredients(recipeConn, userInput)
+greenLitRecipesArray = checkIngredients(recipeConn, normalisedUserInput)
 for greenLitRecipes in greenLitRecipesArray:
     print(sql.sqlGetSpecificID(recipeConn, 'RECIPENAME', greenLitRecipes)[0])
     print(sql.sqlGetSpecificID(recipeConn, 'CLEANINGREDIENTS', greenLitRecipes)[0])
