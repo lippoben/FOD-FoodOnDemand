@@ -5,7 +5,7 @@ import numpy as np
 # creates a connection to a pre-existing database. If the database doesn't exist then create a new one.
 def sqlInit(databaseName):
     connection = sqlite3.connect(databaseName)
-    print("Opened database successfully")
+    print("Opened database successfully\n")
     return connection
 
 
@@ -29,7 +29,7 @@ def sqlCreateTable(databaseConn):
              CLEANINGREDIENTS    TEXT       ,
              METHOD             TEXT        NOT NULL,
              INFOTAGS           TEXT       NOT NULL);''')
-    print("Table created successfully")
+    print("Table created successfully\n")
 
 
 # update an entry within database given primary Key
@@ -49,7 +49,7 @@ def sqlDeleteEntry(databaseConn, primaryKeyID):
 # add a new column to an existing table
 def sqlAddColumn(databaseConn, colName, colType):
     databaseConn.execute('ALTER TABLE RECIPES ADD COLUMN ' + colName + ' ' + colType + ';')
-    print('Column added successfully')
+    print('Column added successfully\n')
 
 
 # print the entire database to console
