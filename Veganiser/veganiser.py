@@ -58,6 +58,7 @@ def remove(t):
 def veganise(recipeDatabase, recipeName):
     veganRecipeIDArray = sql.sqlGetAllVeganRecipes(recipeDatabase)
     nonVeganRecipeIDArray = sql.sqlGetAllNonVeganRecipes(recipeDatabase)
+    possibleAlternativeVeganRecipeArray = []
 
     # rowRecipe = (other_df[other_df['RECIPENAME'] == recipeName])
 
@@ -73,7 +74,8 @@ def veganise(recipeDatabase, recipeName):
         percentageTitleMatch = similar(lowerCaseRecipeName, noVeganTitleLowerCaseVeganRecipeName)[0]
         if percentageTitleMatch >= 0.8:
             # veganRecipe = (vegan_df[vegan_df['RECIPENAME'] == veganRecipeName])
-            print('Here is an alternative vegan recipe: ', veganRecipeName)
+            # print('Here is an alternative vegan recipe: ', veganRecipeName)
+            possibleAlternativeVeganRecipeArray.append(veganRecipeID)
         else:
             # Here is where we will then go into the ingredients
             '''
@@ -85,4 +87,7 @@ def veganise(recipeDatabase, recipeName):
                 print(i)
             '''
             continue
+
+    return possibleAlternativeVeganRecipeArray
+
 
