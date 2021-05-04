@@ -90,7 +90,7 @@ def sqlGetCol(databaseConn, colName):
 def sqlGetSpecificID(databaseConn, colName, PriID):
     cursor = databaseConn.execute('SELECT ' + str(colName) + ' from RECIPES WHERE ID = ' + str(PriID) + ';')
     for row in cursor:
-        return row
+        return row[0]
 
 
 # insert a new record to the database
@@ -99,6 +99,26 @@ def sqlInsertRecords(databaseConn, PriID, URL, RECIPENAME, INGREDIENTS, CLEANING
                       VALUES ("+str(PriID)+",\'"+str(URL)+"\',\'"+str(RECIPENAME)+"\',\'"+str(INGREDIENTS)+"\', \'"+str(CLEANINGREDIENTS)+"\' , \'"+str(METHOD)+"\',\'"+str(INFOTAG)+"\')"
     databaseConn.execute(insertStatement)
     # print("Records created successfully")
+
+
+# returns an array of all the labeled vegan recipes
+def sqlGetAllVeganRecipes(databaseConn):
+    cursor = databaseConn.execute('SELECT ID FROM RECIPES WHERE INFOTAGS = \'Vegan\';')
+    veganRecipeArray = []
+    for row in cursor:
+        veganRecipeArray.append(row[0])
+
+    return veganRecipeArray
+
+
+# returns an array of all the labeled non vegan recipes
+def sqlGetAllNonVeganRecipes(databaseConn):
+    cursor = databaseConn.execute('SELECT ID FROM RECIPES WHERE NOT INFOTAGS = \'Vegan\';')
+    nonVeganRecipeArray = []
+    for row in cursor:
+        nonVeganRecipeArray.append(row[0])
+
+    return nonVeganRecipeArray
 
 
 # allows for a custom query to be made if a the functionality hasn't been added to this module yet
