@@ -7,14 +7,14 @@ def removeDuplicates(myList):
     return list(dict.fromkeys(myList))
 
 
-def checkIngredients(recipeDatabaseConn, randomIngredientsDf):
+def checkIngredients(recipeDatabaseConn, userIngredientsDf):
     IDArray = sql.sqlGetCol(recipeDatabaseConn, "ID")
     possibleRecipesID = []
 
     for ID in IDArray:
         cleanIngredients = sql.sqlGetSpecificID(recipeDatabaseConn, "CLEANINGREDIENTS", ID)[0].split(", ")
         for j in range(0, len(cleanIngredients)):
-            if len(randomIngredientsDf[randomIngredientsDf['Ingredients'] == cleanIngredients[j]]) == 0:
+            if len(userIngredientsDf[userIngredientsDf['Ingredients'] == cleanIngredients[j]]) == 0:
                 break
             possibleRecipesID.append(ID)
 
