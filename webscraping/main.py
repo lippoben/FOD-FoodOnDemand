@@ -1,8 +1,11 @@
+import numpy as np
+import pandas as pd
+import re
 import requests
 from bs4 import BeautifulSoup
-from pprint import *
 import sqlDatabaseManagement as sql
-import numpy as np
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 
 # https://www.bbcgoodfood.com/recipes/category Category = Collections
 # https://www.bbcgoodfood.com/recipes/collection/quick-and-healthy-recipes/ Collections = Recipes
@@ -24,6 +27,22 @@ def removeDuplicates(myList):
     return list(dict.fromkeys(myList))
 
 
+def stemSentence(sentence):
+    token_words = word_tokenize(sentence)
+    stem_sentence = []
+    for word in token_words:
+        stem_sentence.append(wnl.lemmatize(word))
+        stem_sentence.append(" ")
+    return "".join(stem_sentence)
+
+
+def normaliseIngredients(string):
+    string = string.lower()
+    string = re.sub("[^a-zA-Z ]+", "", string)
+    string = stemSentence(string)
+    return string
+
+
 def scrapeRecipeName(recipeNameSoup):
     for tag in recipeNameSoup:
         recipeNameString = str(tag.text)
@@ -31,6 +50,37 @@ def scrapeRecipeName(recipeNameSoup):
     recipeNameString = recipeNameString.replace('\'', '')
 
     return recipeNameString
+
+
+def cleanIngredients(dirtyIngredients):
+    split_ingredients = dirtyIngredients.split(",")
+    cleanSplitIngredients = []
+    normalisedIngredients = []
+
+    for i in range(0, len(split_ingredients)):
+        cleanSplitIngredients.append(normaliseIngredients(split_ingredients[i]))
+        words = cleanSplitIngredients[i].split(" ")[:-1]
+        longest_word = ""
+
+        for j in range(0, len(words)):
+            for k in range(0, len(words) - j):
+                temp_words = ' '.join(words[j: len(words) - k])
+
+                if len(all_ingredients[all_ingredients['Ingredients'] == temp_words]) > 0:
+                    if longest_word == "" or len(temp_words.split(" ")) > len(longest_word.split(" ")):
+                        longest_word = temp_words
+
+        if longest_word != "":
+            normalisedIngredients.append(longest_word)
+
+    normalisedIngredients = set(normalisedIngredients)
+    normalisedIngredients = list(normalisedIngredients)
+
+    normalisedIngredients = str(normalisedIngredients)
+    normalisedIngredients = normalisedIngredients.replace('[', '')
+    normalisedIngredients = normalisedIngredients.replace(']', '')
+    normalisedIngredients = normalisedIngredients.replace('\'', '')
+    return normalisedIngredients
 
 
 def scrapeIngredients(ingredientsSoup):
@@ -78,6 +128,12 @@ def scrapeMethod(methodTableSoup):
 # create/connect to the recipe database
 connection = sql.sqlInit("recipeDatabase.db")
 
+# pre load potential ingredients csv. used for cleaning and normalising ingredients
+all_ingredients = pd.read_csv("normalised_ingredients.csv")
+
+# used when cleaning and normalising ingredients
+wnl = WordNetLemmatizer()
+
 # creates the table in the database. WARNING: this line only needs to be run once after a new database is created
 #                                             so comment out if connecting to pre-existing database
 sql.sqlCreateTable(connection)
@@ -108,12 +164,12 @@ while linksToExplore:
 
                     recipeName = scrapeRecipeName(soup.find_all('h1', class_='post-header__title post-header__title--masthead-layout heading-1'))
                     ingredientsArray = scrapeIngredients(soup.find_all('li', class_='pb-xxs pt-xxs list-item list-item--separator'))
-                    infoTagsArray = scrapeVeganTag(soup.find_all('div', class_='icon-with-text icon-with-text--aligned'))
+                    cleanIngredientsArray = cleanIngredients(ingredientsArray)
+                    infoTagsArray = scrapeVeganTag(soup.find_all('span', class_='terms-icons-list__text'))
                     methodArray = scrapeMethod(soup.find('ul', class_='grouped-list__list list'))
                     linkString = str(link).replace('\'', '')
-
-                    # sql.sqlInsertRecords(connection, primaryKeyId, recipeName, ingredientsArray, infoTagsArray)
-                    sql.sqlInsertRecords(connection, primaryKeyId, linkString, recipeName, ingredientsArray, methodArray, infoTagsArray)
+                    sql.sqlInsertRecords(connection, primaryKeyId, linkString, recipeName, ingredientsArray,
+                                         cleanIngredientsArray, methodArray, infoTagsArray)
                     sql.sqlCommit(connection)
                     primaryKeyId += 1
 
@@ -133,7 +189,7 @@ while linksToExplore:
                         else:
                             linksToExplore.append(href.get('href'))
 
-                if primaryKeyId % 101 == 0:
+                if len(linksToExplore) % 100 == 0:
                     print("Recipes Found: " + str(primaryKeyId - 1))
                     print("Links left to explore: " + str(len(linksToExplore)) + "\n")
 

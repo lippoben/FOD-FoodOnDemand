@@ -1,6 +1,5 @@
 import sqlite3
 import numpy as np
-import pandas as pd
 
 
 # creates a connection to a pre-existing database. If the database doesn't exist then create a new one.
@@ -64,7 +63,7 @@ def sqlPrintAll(databaseConn):
 def sqlCount(databaseConn):
     cursor = databaseConn.execute('SELECT COUNT(*) FROM RECIPES;')
     for row in cursor:
-        return row
+        return row[0]
 
 
 # Returns an array of all the column names
@@ -95,24 +94,8 @@ def sqlGetSpecificID(databaseConn, colName, PriID):
 
 
 # insert a new record to the database
-def sqlInsertRecords(databaseConn, PriID, URL, RECIPENAME, INGREDIENTS, METHOD, INFOTAG):
-    insertStatement = "INSERT INTO RECIPES (ID, URL, RECIPENAME, INGREDIENTS, METHOD, INFOTAGS)  \
-                      VALUES ("+str(PriID)+",\'"+str(URL)+"\',\'"+str(RECIPENAME)+"\',\'"+str(INGREDIENTS)+"\',\'"+str(METHOD)+"\',\'"+str(INFOTAG)+"\')"
+def sqlInsertRecords(databaseConn, PriID, URL, RECIPENAME, INGREDIENTS, CLEANINGREDIENTS, METHOD, INFOTAG):
+    insertStatement = "INSERT INTO RECIPES (ID, URL, RECIPENAME, INGREDIENTS, CLEANINGREDIENTS, METHOD, INFOTAGS)  \
+                      VALUES ("+str(PriID)+",\'"+str(URL)+"\',\'"+str(RECIPENAME)+"\',\'"+str(INGREDIENTS)+"\', \'"+str(CLEANINGREDIENTS)+"\' , \'"+str(METHOD)+"\',\'"+str(INFOTAG)+"\')"
     databaseConn.execute(insertStatement)
     # print("Records created successfully")
-
-'''
-# this is an example of how to create and insert stuff
-# -----------------------------
-conn = sqlInit("recipeDatabase.db")
-# sqlCreateTable(conn)
-# sqlInsertRecords(conn, 3, "chicky nuggys", "chicken")
-# sqlAddColumn(conn, 'CLEANINGREDIENTS', 'TEXT')
-# sqlPrintAll(conn)
-print(sqlGetSpecificID(conn, 'INGREDIENTS', 2806))
-sqlDeleteEntry(conn, 2806)
-print(sqlGetSpecificID(conn, 'INGREDIENTS', 2806))
-sqlCommit(conn)
-
-sqlClose(conn)
-'''
