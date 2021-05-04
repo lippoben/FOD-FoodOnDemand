@@ -22,6 +22,7 @@ greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInpu
 # output green lit recipes for funzys
 for greenLitRecipeID in greenLitRecipesIDArray:
     greenLitRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', greenLitRecipeID)
+    greenLitRecipeURL = sql.sqlGetSpecificID(recipeDatabaseConn, 'URL', greenLitRecipeID)
     greenLitRecipeIngredients = sql.sqlGetSpecificID(recipeDatabaseConn, 'CLEANINGREDIENTS', greenLitRecipeID)
     greenLitRecipeMethod = sql.sqlGetSpecificID(recipeDatabaseConn, 'METHOD', greenLitRecipeID)
 
@@ -32,6 +33,7 @@ for greenLitRecipeID in greenLitRecipesIDArray:
 
     # Display output to the user
     print(greenLitRecipeID)
+    print(greenLitRecipeURL)
     print(greenLitRecipeName)
     print(greenLitRecipeIngredients)
     pprint(greenLitRecipeMethod)
