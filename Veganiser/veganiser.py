@@ -1,10 +1,6 @@
 import pandas as pd
 from difflib import SequenceMatcher
 
-data = pd.read_csv('TRIAL2.csv')
-vegan_df = data[data['INFOTAGS'] == 'Vegan']
-other_df = data[data['INFOTAGS'] != 'Vegan']
-
 
 # sequence matcher,
 def similar(a, b):
@@ -54,33 +50,41 @@ def remove(t):
     return words
 
 
-# input recipe name from other_df, iterate through titles in vegan_df, if ratio >0.9 print recipe name, else go through the clean ingredients
-
-a = input('Enter recipe: ')
-rowrecipe = (other_df[other_df['RECIPENAME'] == a])
+# input recipe name from other_df, iterate through titles in vegan_df, if ratio >0.9 print recipe name
+# else go through the clean ingredients
 
 
-# putting everything in lower case so it matches
-b = a.lower()
-b = remove_title(b)
-n = rowrecipe['CLEANINGREDIENTS']
+data = pd.read_csv('TRIAL2.csv')
+vegan_df = data[data['INFOTAGS'] == 'Vegan']
+other_df = data[data['INFOTAGS'] != 'Vegan']
 
-for i in vegan_df['RECIPENAME']:
-    i = str(i)
-    j = i.lower()
-    c = remove_title(j)
-    d = similar(b,c)
-    if d[0] >= 0.8:
-        # print(d)
-        # so we can also print the ingredients or method, whatever we want the output to be
-        veganrecipe = (vegan_df[vegan_df['RECIPENAME'] == i])
-        print('Here is an alternative vegan recipe: ', i)
-    else:
-        # Here is where we will then go into the ingredients
-        continue
-        #for o in vegan_df['CLEANINGREDIENTS']:
-         #   o=remove(o)
-        #    M = (similar(n,o))
-            #if M[0] >= 0.5:
-         #   print(M)
-        #    print(i)
+
+def veganise(recipeDatabase, recipeName):
+    rowRecipe = (other_df[other_df['RECIPENAME'] == recipeName])
+
+    # putting everything in lower case so it matches
+    lowerCaseRecipeName = recipeName.lower()
+    lowerCaseRecipeName = remove_title(lowerCaseRecipeName)
+    recipeCleanIngredients = rowRecipe['CLEANINGREDIENTS']
+
+    for i in vegan_df['RECIPENAME']:
+        i = str(i)
+        j = i.lower()
+        c = remove_title(j)
+        d = similar(lowerCaseRecipeName, c)
+        if d[0] >= 0.8:
+            # print(d)
+            # so we can also print the ingredients or method, whatever we want the output to be
+            veganRecipe = (vegan_df[vegan_df['RECIPENAME'] == i])
+            print('Here is an alternative vegan recipe: ', i)
+        else:
+            # Here is where we will then go into the ingredients
+            '''
+            for o in vegan_df['CLEANINGREDIENTS']:
+                o=remove(o)
+                M = (similar(n,o))
+                if M[0] >= 0.5:
+                print(M)
+                print(i)
+            '''
+            continue

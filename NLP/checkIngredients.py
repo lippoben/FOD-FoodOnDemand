@@ -1,4 +1,4 @@
-from webscraping import sqlDatabaseManagement as sql
+from Webscraping import sqlDatabaseManagement as sql
 
 
 def removeDuplicates(myList):

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from pprint import pprint
-from webscraping import sqlDatabaseManagement as sql
+from Webscraping import sqlDatabaseManagement as sql
 # from Veganiser import veganiser
 from NLP.checkIngredients import checkIngredients
 from NLP.ingredientNormliser import cleanIngredients
@@ -17,6 +17,7 @@ normalisedUserInput = cleanIngredients(userInput)
 
 # Green light recipes here
 greenLitRecipesArray = checkIngredients(recipeConn, normalisedUserInput)
+# output green lit recipes for funzys
 for greenLitRecipes in greenLitRecipesArray:
     print(sql.sqlGetSpecificID(recipeConn, 'RECIPENAME', greenLitRecipes)[0])
     print(sql.sqlGetSpecificID(recipeConn, 'CLEANINGREDIENTS', greenLitRecipes)[0])
