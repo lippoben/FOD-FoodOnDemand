@@ -39,8 +39,12 @@ for greenLitRecipeID in greenLitRecipesIDArray:
     if len(possibleVeganAlternativeIDArray) >= 2:
         print('\nList of possible vegan alternatives: ')
         for possibleVeganAlternativeID in possibleVeganAlternativeIDArray:
-            print(possibleVeganAlternativeID)
-            print(sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', possibleVeganAlternativeID))
+            possibleVeganAlternativeRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn,
+                                                                      'RECIPENAME', possibleVeganAlternativeID)
+
+            if possibleVeganAlternativeID != greenLitRecipeID:
+                print(possibleVeganAlternativeID)
+                print(possibleVeganAlternativeRecipeName)
 
     print('\n')
 
