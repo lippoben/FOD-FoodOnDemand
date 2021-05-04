@@ -2,34 +2,45 @@ import numpy as np
 import pandas as pd
 from pprint import pprint
 from Webscraping import sqlDatabaseManagement as sql
-# from Veganiser import veganiser
+from Veganiser.veganiser import veganise
 from NLP.checkIngredients import checkIngredients
 from NLP.ingredientNormliser import cleanIngredients
 
 # establish connection to database
-recipeConn = sql.sqlInit('recipeDatabase.db')
+recipeDatabaseConn = sql.sqlInit('recipeDatabase.db')
 
 # this will be what the user has in stock
-userInput = np.array(['eggs', 'potatoes', 'olives oil'])
+# userInput = np.array(['potatoes', 'olives oil'])
+userInput = pd.read_csv('C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/NLP/normalisedIngredients.csv').head(50)
+userInput = np.array(userInput['Ingredients'])
 
 # normalise and clean users input
 normalisedUserInput = cleanIngredients(userInput)
 
 # Green light recipes here
-greenLitRecipesArray = checkIngredients(recipeConn, normalisedUserInput)
+greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInput)
 # output green lit recipes for funzys
-for greenLitRecipes in greenLitRecipesArray:
-    print(sql.sqlGetSpecificID(recipeConn, 'RECIPENAME', greenLitRecipes)[0])
-    print(sql.sqlGetSpecificID(recipeConn, 'CLEANINGREDIENTS', greenLitRecipes)[0])
-    pprint(sql.sqlGetSpecificID(recipeConn, 'METHOD', greenLitRecipes)[0])
+for greenLitRecipeID in greenLitRecipesIDArray:
+    greenLitRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', greenLitRecipeID)
+    greenLitRecipeIngredients = sql.sqlGetSpecificID(recipeDatabaseConn, 'CLEANINGREDIENTS', greenLitRecipeID)
+    greenLitRecipeMethod = sql.sqlGetSpecificID(recipeDatabaseConn, 'METHOD', greenLitRecipeID)
+
+    # Check Green lit recipes here against user's preference profile and select the recipes that best match
+
+    # Veganise Recipes
+    possibleVeganAlternativeIDArray = veganise(recipeDatabaseConn, greenLitRecipeName)
+
+    # Display output to the user
+    print(greenLitRecipeID)
+    print(greenLitRecipeName)
+    print(greenLitRecipeIngredients)
+    pprint(greenLitRecipeMethod)
+
+    if len(possibleVeganAlternativeIDArray) >= 2:
+        print('\nList of possible vegan alternatives: ')
+        for possibleVeganAlternativeID in possibleVeganAlternativeIDArray:
+            print(possibleVeganAlternativeID)
+            print(sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', possibleVeganAlternativeID))
+
     print('\n')
-
-
-# Check Green lit recipes here against user's preference profile and select the recipes that best match
-
-
-# Veganise Recipes
-
-
-# Display output to the user
 
