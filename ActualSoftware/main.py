@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from pprint import pprint
 from Webscraping import sqlDatabaseManagement as sql
 from Veganiser.veganiser import veganise
@@ -10,17 +9,30 @@ from NLP.ingredientNormliser import cleanIngredients
 recipeDatabaseConn = sql.sqlInit('recipeDatabase.db')
 
 # this will be what the user has in stock
-# userInput = np.array(['potatoes', 'olives oil'])
-userInput = pd.read_csv('C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/NLP/normalisedIngredients.csv').head(50)
-userInput = np.array(userInput['Ingredients'])
+userInput = ['peppers', 'chickpeas', 'soy sauce', 'onion', 'salt', 'pepper', 'Bread', 'basmati rice', 'garlic']
+userInputting = True
+while userInputting:
+    isUserDone = input('If you are finished type Y else type N: ')
+    if isUserDone == 'Y':
+        userInputting = False
+    else:
+        userInput.append(input('Please input 1 ingredient: '))
+        print(userInput)
+
+    print('\n')
+
+userInput = np.array(userInput)
+# userInput = pd.read_csv('C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/NLP/normalisedIngredients.csv').head(50)
+# userInput = np.array(userInput['Ingredients'])
 
 # normalise and clean users input
 normalisedUserInput = cleanIngredients(userInput)
+print(normalisedUserInput)
 
 # Green light recipes here
-greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInput)
+greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInput, threshold=0.4)
 # output green lit recipes for funzys
-for greenLitRecipeID in greenLitRecipesIDArray:
+for greenLitRecipeID, threshold in greenLitRecipesIDArray:
     greenLitRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', greenLitRecipeID)
     greenLitRecipeURL = sql.sqlGetSpecificID(recipeDatabaseConn, 'URL', greenLitRecipeID)
     greenLitRecipeIngredients = sql.sqlGetSpecificID(recipeDatabaseConn, 'CLEANINGREDIENTS', greenLitRecipeID)
@@ -35,6 +47,7 @@ for greenLitRecipeID in greenLitRecipesIDArray:
     print(greenLitRecipeID)
     print(greenLitRecipeURL)
     print(greenLitRecipeName)
+    print("Match percentage: " + str(round(threshold*100)))
     print(greenLitRecipeIngredients)
     pprint(greenLitRecipeMethod)
 

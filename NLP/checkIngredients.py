@@ -5,13 +5,23 @@ def removeDuplicates(myList):
     return list(dict.fromkeys(myList))
 
 
-def checkIngredients(recipeDatabaseConn, userIngredientsArray):
+# take the second element for sort
+def takeSecond(elem):
+    return elem[1]
+
+
+def checkIngredients(recipeDatabaseConn, userIngredientsArray, threshold=1):
     IDArray = sql.sqlGetCol(recipeDatabaseConn, "ID")
     possibleRecipesID = []
     for ID in IDArray:
         recipeCleanIngredients = sql.sqlGetSpecificID(recipeDatabaseConn, "CLEANINGREDIENTS", ID).split(", ")
-        if set.issubset(set(recipeCleanIngredients), set(userIngredientsArray)):
-            possibleRecipesID.append(ID)
+        recipeSet = set(recipeCleanIngredients)
+        userSet = set(userIngredientsArray)
 
-    return possibleRecipesID
+        intersectionSet = set.intersection(recipeSet, userSet)
+        recipeThreshold = len(intersectionSet)/len(recipeSet)
+        if recipeThreshold >= threshold:
+            possibleRecipesID.append([ID, recipeThreshold])
+
+    return sorted(possibleRecipesID, key=takeSecond, reverse=True)
 
