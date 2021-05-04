@@ -129,7 +129,7 @@ def scrapeMethod(methodTableSoup):
 connection = sql.sqlInit("recipeDatabase.db")
 
 # pre load potential ingredients csv. used for cleaning and normalising ingredients
-all_ingredients = pd.read_csv("normalised_ingredients.csv")
+all_ingredients = pd.read_csv("normalisedIngredients.csv")
 
 # used when cleaning and normalising ingredients
 wnl = WordNetLemmatizer()
