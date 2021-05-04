@@ -32,7 +32,7 @@ print(normalisedUserInput)
 # Green light recipes here
 greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInput, threshold=0.4)
 # output green lit recipes for funzys
-for greenLitRecipeID, threshold in greenLitRecipesIDArray:
+for greenLitRecipeID, greenLitRecipeMissingIngredients, threshold in greenLitRecipesIDArray:
     greenLitRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', greenLitRecipeID)
     greenLitRecipeURL = sql.sqlGetSpecificID(recipeDatabaseConn, 'URL', greenLitRecipeID)
     greenLitRecipeIngredients = sql.sqlGetSpecificID(recipeDatabaseConn, 'CLEANINGREDIENTS', greenLitRecipeID)
@@ -44,11 +44,18 @@ for greenLitRecipeID, threshold in greenLitRecipesIDArray:
     possibleVeganAlternativeIDArray = veganise(recipeDatabaseConn, greenLitRecipeName)
 
     # Display output to the user
-    print(greenLitRecipeID)
-    print(greenLitRecipeURL)
-    print(greenLitRecipeName)
-    print("Match percentage: " + str(round(threshold*100)))
-    print(greenLitRecipeIngredients)
+    print('ID: ' + str(greenLitRecipeID))
+    print('URL: ' + greenLitRecipeURL)
+    print('Recipe Name: ' + greenLitRecipeName)
+    print("Percentage of matching ingredients: " + str(round(threshold*100)))
+    print("\nList of missing ingredients:")
+    for missingIngredients in greenLitRecipeMissingIngredients:
+        print("     " + missingIngredients)
+
+    print("\nList of recipe ingredients:")
+    for recipeIngredients in greenLitRecipeIngredients.split(', '):
+        print("     " + recipeIngredients)
+    print("\nMethod:")
     pprint(greenLitRecipeMethod)
 
     if len(possibleVeganAlternativeIDArray) >= 2:

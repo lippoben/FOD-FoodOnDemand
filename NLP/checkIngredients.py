@@ -6,8 +6,8 @@ def removeDuplicates(myList):
 
 
 # take the second element for sort
-def takeSecond(elem):
-    return elem[1]
+def takeThird(elem):
+    return elem[2]
 
 
 def checkIngredients(recipeDatabaseConn, userIngredientsArray, threshold=1):
@@ -17,11 +17,10 @@ def checkIngredients(recipeDatabaseConn, userIngredientsArray, threshold=1):
         recipeCleanIngredients = sql.sqlGetSpecificID(recipeDatabaseConn, "CLEANINGREDIENTS", ID).split(", ")
         recipeSet = set(recipeCleanIngredients)
         userSet = set(userIngredientsArray)
-
+        missingIngredients = recipeSet - userSet
         intersectionSet = set.intersection(recipeSet, userSet)
         recipeThreshold = len(intersectionSet)/len(recipeSet)
         if recipeThreshold >= threshold:
-            possibleRecipesID.append([ID, recipeThreshold])
-
-    return sorted(possibleRecipesID, key=takeSecond, reverse=True)
+            possibleRecipesID.append([ID, missingIngredients, recipeThreshold])
+    return sorted(possibleRecipesID, key=takeThird, reverse=True)
 
