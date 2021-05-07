@@ -4,12 +4,18 @@ from Webscraping import sqlDatabaseManagement as sql
 from Veganiser.veganiser import veganise
 from NLP.checkIngredients import checkIngredients
 from NLP.ingredientNormliser import cleanIngredients
+from GloVe import getPotentialSubstitutes
 
 # establish connection to database
 recipeDatabaseConn = sql.sqlInit('recipeDatabase.db')
 
+# initialise the glove model
+wordEmbedding, fullCleanIngredientsArray = getPotentialSubstitutes.gloveInit()
+
 # this will be what the user has in stock
-userInput = ['peppers', 'chickpeas', 'soy sauce', 'onion', 'salt', 'pepper', 'Bread', 'basmati rice', 'garlic']
+userInput = ['salt', 'butter', 'bread', 'pickles', 'mustard', 'mayonnaise', 'ham', 'lettuce', 'tomato',
+             'sauerkraut', 'onion', 'cheese', 'halloumi', 'pork', 'bacon', 'steak', 'tomato']
+tolerance = 0.5
 userInputting = True
 while userInputting:
     isUserDone = input('If you are finished type Y else type N: ')
@@ -29,8 +35,18 @@ userInput = np.array(userInput)
 normalisedUserInput = cleanIngredients(userInput)
 print(normalisedUserInput)
 
+'''
+# use glove model to add any potential substitute ingredients to user ingredients
+substituteDic = {}
+for ingredient in normalisedUserInput:
+    potentialSubstitutes = getPotentialSubstitutes.queryGlove(wordEmbedding, ingredient, fullCleanIngredientsArray)
+    substituteDic[ingredient] = potentialSubstitutes
+
+print(substituteDic)
+'''
+
 # Green light recipes here
-greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInput, threshold=0.4)
+greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInput, threshold=tolerance)
 # output green lit recipes for funzys
 for greenLitRecipeID, greenLitRecipeMissingIngredients, threshold in greenLitRecipesIDArray:
     greenLitRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', greenLitRecipeID)
@@ -49,8 +65,19 @@ for greenLitRecipeID, greenLitRecipeMissingIngredients, threshold in greenLitRec
     print('Recipe Name: ' + greenLitRecipeName)
     print("Percentage of matching ingredients: " + str(round(threshold*100)))
     print("\nList of missing ingredients:")
-    for missingIngredients in greenLitRecipeMissingIngredients:
-        print("     " + missingIngredients)
+    for missingIngredient in greenLitRecipeMissingIngredients:
+        possibleSubstitutes = getPotentialSubstitutes.queryGlove(wordEmbedding, missingIngredient,
+                                                                 fullCleanIngredientsArray)
+        possibleSubstitutes = set.intersection(set(possibleSubstitutes), set(normalisedUserInput))
+        if possibleSubstitutes:
+            printLine = "     " + missingIngredient + '. However, you could substitute this with '
+            for substitute in possibleSubstitutes:
+                printLine += substitute + ', '
+            print(printLine[0:-2])
+
+        else:
+            print("     " + missingIngredient + '. Sorry, we couldn\'t '
+                                                'find any possible substitutes in your available ingredients.')
 
     print("\nList of recipe ingredients:")
     for recipeIngredients in greenLitRecipeIngredients.split(', '):

@@ -86,7 +86,6 @@ def findNearestIngredients(wordEmbeddings, ingredient, cleanIngredients, maxIngr
         return closestIngredientsArray
 
     except KeyError:
-        print("no embedding for this ingredient skipping")
         return closestIngredientsArray
 
 
