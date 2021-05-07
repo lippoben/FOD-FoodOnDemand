@@ -14,7 +14,7 @@ wordEmbedding, fullCleanIngredientsArray = getPotentialSubstitutes.gloveInit()
 
 # this will be what the user has in stock
 userInput = ['salt', 'butter', 'bread', 'pickles', 'mustard', 'mayonnaise', 'ham', 'lettuce', 'tomato',
-             'sauerkraut', 'onion', 'cheese', 'halloumi', 'pork', 'bacon', 'steak', 'tomato']
+             'sauerkraut', 'onion', 'cheese', 'halloumi', 'pork', 'bacon', 'steak']
 tolerance = 0.5
 userInputting = True
 while userInputting:
@@ -47,7 +47,7 @@ print(substituteDic)
 
 # Green light recipes here
 greenLitRecipesIDArray = checkIngredients(recipeDatabaseConn, normalisedUserInput, threshold=tolerance)
-# output green lit recipes for funzys
+# Process green lit recipes to check for vegan alternatives and possible ingredient substitutes
 for greenLitRecipeID, greenLitRecipeMissingIngredients, threshold in greenLitRecipesIDArray:
     greenLitRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn, 'RECIPENAME', greenLitRecipeID)
     greenLitRecipeURL = sql.sqlGetSpecificID(recipeDatabaseConn, 'URL', greenLitRecipeID)
@@ -57,7 +57,7 @@ for greenLitRecipeID, greenLitRecipeMissingIngredients, threshold in greenLitRec
     # Check Green lit recipes here against user's preference profile and select the recipes that best match
 
     # Veganise Recipes
-    possibleVeganAlternativeIDArray = veganise(recipeDatabaseConn, greenLitRecipeName)
+    possibleVeganAlternativeIDArray = veganise(recipeDatabaseConn, greenLitRecipeID)
 
     # Display output to the user
     print('ID: ' + str(greenLitRecipeID))
@@ -90,10 +90,20 @@ for greenLitRecipeID, greenLitRecipeMissingIngredients, threshold in greenLitRec
         for possibleVeganAlternativeID in possibleVeganAlternativeIDArray:
             possibleVeganAlternativeRecipeName = sql.sqlGetSpecificID(recipeDatabaseConn,
                                                                       'RECIPENAME', possibleVeganAlternativeID)
+            possibleVeganAlternativeRecipeURL = sql.sqlGetSpecificID(recipeDatabaseConn,
+                                                                      'URL', possibleVeganAlternativeID)
+            possibleVeganAlternativeRecipeIngredients = sql.sqlGetSpecificID(recipeDatabaseConn,
+                                                                      'CLEANINGREDIENTS', possibleVeganAlternativeID)
 
             if possibleVeganAlternativeID != greenLitRecipeID:
-                print(possibleVeganAlternativeID)
-                print(possibleVeganAlternativeRecipeName)
+                print('ID: ' + str(possibleVeganAlternativeID))
+                print('URL: ' + possibleVeganAlternativeRecipeURL)
+                print('Recipe Name: ' + possibleVeganAlternativeRecipeName)
+                print("List of recipe ingredients:")
+                for ingredients in possibleVeganAlternativeRecipeIngredients.split(', '):
+                    print("     " + ingredients)
 
-    print('\n')
+                print('\n')
+
+    print('\n --------------------------------------------------------------------')
 
