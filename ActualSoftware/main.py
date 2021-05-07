@@ -57,7 +57,8 @@ for greenLitRecipeID, greenLitRecipeMissingIngredients, threshold in greenLitRec
     # Check Green lit recipes here against user's preference profile and select the recipes that best match
 
     # Veganise Recipes
-    possibleVeganAlternativeIDArray = veganise(recipeDatabaseConn, greenLitRecipeID)
+    possibleVeganAlternativeIDArray = veganise(recipeDatabaseConn, greenLitRecipeID,
+                                               ingredientsMatchThreshold=threshold)
 
     # Display output to the user
     print('ID: ' + str(greenLitRecipeID))
