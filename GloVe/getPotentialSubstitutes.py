@@ -70,7 +70,7 @@ def removeStopWords():
             g.write(textWithoutStopWords)
 
 
-def findNearestIngredients(wordEmbeddings, ingredient, maxIngredients=2):
+def findNearestIngredients(wordEmbeddings, ingredient, cleanIngredients, maxIngredients=2):
     closestEmbeddingsArray = findClosestEmbeddings(wordEmbeddings, wordEmbeddings[ingredient])[1:20]
     closestIngredientsArray = []
     for closestEmbeddings in closestEmbeddingsArray:
@@ -102,9 +102,9 @@ def gloveInit():
     return embeddings, cleanIngredients
 
 
-def queryGlove(embeddings, queryIngredient):
+def queryGlove(embeddings, queryIngredient, cleanIngredientsArray):
     print('Glove output for \'' + queryIngredient + '\'')
-    print(findNearestIngredients(embeddings, queryIngredient, maxIngredients=3))
+    print(findNearestIngredients(embeddings, queryIngredient, cleanIngredientsArray, maxIngredients=3))
 
 
 # trainModel('corpora/noStopwordsMethodCorpus/', 3)
