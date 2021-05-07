@@ -71,17 +71,23 @@ def removeStopWords():
 
 
 def findNearestIngredients(wordEmbeddings, ingredient, cleanIngredients, maxIngredients=2):
-    closestEmbeddingsArray = findClosestEmbeddings(wordEmbeddings, wordEmbeddings[ingredient])[1:20]
     closestIngredientsArray = []
-    for closestEmbeddings in closestEmbeddingsArray:
-        if closestEmbeddings in cleanIngredients:
-            closestIngredientsArray.append(closestEmbeddings)
-            # print(closestEmbeddings)
+    try:
+        closestEmbeddingsArray = findClosestEmbeddings(wordEmbeddings, wordEmbeddings[ingredient])[1:20]
 
-        if len(closestIngredientsArray) >= maxIngredients:
-            return closestIngredientsArray
+        for closestEmbeddings in closestEmbeddingsArray:
+            if closestEmbeddings in cleanIngredients:
+                closestIngredientsArray.append(closestEmbeddings)
+                # print(closestEmbeddings)
 
-    return closestIngredientsArray
+            if len(closestIngredientsArray) >= maxIngredients:
+                return closestIngredientsArray
+
+        return closestIngredientsArray
+
+    except KeyError:
+        print("no embedding for this ingredient skipping")
+        return closestIngredientsArray
 
 
 def formatWordEmbeddings(gloveModel):
@@ -97,14 +103,14 @@ def gloveInit():
 
     cleanIngredients = pd.read_csv('C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/NLP/normalisedIngredients.csv')
     cleanIngredients = np.array(cleanIngredients['Ingredients'])
-    gloveModel = Glove.load('models/glove 400.txt')
+    gloveModel = Glove.load('C:/Users/lipb1/Documents/Year 3 Bristol/MDM3/FOD/GloVe/models/glove 400.txt')
     embeddings = formatWordEmbeddings(gloveModel)
     return embeddings, cleanIngredients
 
 
 def queryGlove(embeddings, queryIngredient, cleanIngredientsArray):
-    print('Glove output for \'' + queryIngredient + '\'')
-    print(findNearestIngredients(embeddings, queryIngredient, cleanIngredientsArray, maxIngredients=3))
+    # print('Glove output for \'' + queryIngredient + '\'')
+    return findNearestIngredients(embeddings, queryIngredient, cleanIngredientsArray, maxIngredients=3)
 
 
 # trainModel('corpora/noStopwordsMethodCorpus/', 3)
