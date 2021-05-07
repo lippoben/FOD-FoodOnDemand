@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np 
 from difflib import SequenceMatcher
 
-data= pd.read_csv('recipeDatabase.csv')
-vegan_df=data[data['INFOTAGS']=='Vegan']
-other_df=data[data['INFOTAGS']!='Vegan']
+data = pd.read_csv('recipeDatabase.csv')
+vegan_df = data[data['INFOTAGS'] == 'Vegan']
+other_df = data[data['INFOTAGS'] != 'Vegan']
+
 
 def ingredients(r):
     word_list = r.split(', ')
@@ -12,7 +13,8 @@ def ingredients(r):
     ing_list = list(S)
     return ing_list
 
-#all unique ingredients 
+
+# all unique ingredients
 unique = []
 for i in other_df['CLEANINGREDIENTS']:
     for x in ingredients(i):
@@ -20,16 +22,16 @@ for i in other_df['CLEANINGREDIENTS']:
             unique.append(x)
     print(unique)       
     
-#unique = sorted(unique)
-#print(unique)
+# unique = sorted(unique)
+# print(unique)
 
-#non vegan ingredients
+# non vegan ingredients
 non_vegan = ['chicken', 'beef', 'egg', 'pork', 'chicken breast']
-#non vegan ingredients that can easily be substituted
+# non vegan ingredients that can easily be substituted
 easy_vegan = ['milk', 'butter', 'honey', 'yogurt', 'cream cheese']
 
 
-#outputting which recipes are non vegan, can be vegan or vegan 
+# outputting which recipes are non vegan, can be vegan or vegan
 for i in other_df['CLEANINGREDIENTS']:
     check = any(item in non_vegan for item in ingredients(i))
     ish = any(item in easy_vegan for item in ingredients(i))
